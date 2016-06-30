@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Ethereum Lottery - fueled by Bitcoin blocks</title>
+
+  <!--Mobile Specific Meta Tag-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <!--Favicon-->
+  <link rel="shortcut icon" href="img/favicon.png">
+  <link rel="icon" href="img/favicon.png">
+
+  <!-- All Theme Styles including Bootstrap, FontAwesome, etc. compiled from styles.scss-->
+  <link href="css/styles.min.css" rel="stylesheet" media="screen">
+  <link href="css/pygments.css" rel="stylesheet" media="screen">
+  <link href="css/custom.css" rel="stylesheet" media="screen">
+
+  <!--Modernizr / Detectizr-->
+  <script src="js/vendor/modernizr.custom.js"></script>
+  <script src="js/vendor/detectizr.min.js"></script>
+</head>
+
+<!-- Body -->
+<!-- "is-preloader preloading" is a helper classes if preloader is enabled. -->
+<body class="is-preloader preloading">
+  
+  <!-- Preloader -->
+  <!-- 
+      Data API:
+      data-spinner - Options: 'spinner1', 'spinner2', 'spinner3', 'spinner4', 'spinner5', 'spinner6', 'spinner7'
+      data-screenbg - Screen background color. Hex, RGB or RGBA colors
+   -->
+  <div id="preloader" data-spinner="spinner1" data-screenbg="#fff"></div>
+
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <!-- Create Account Section -->
+    <section class="fw-section space-top padding-top text-center" style="background-image: url(img/home/funding-progress-bg.jpg);">
+      <div class="container padding-bottom">
+        <img src="img/clover.png" class="block-center" alt="Logo">
+        <h1 class="scrollReveal sr-bottom">Ethereum Lottery</h1>
+        <h2 class="text-gray text-normal scrollReveal sr-bottom sr-delay-1">
+            <span id="react-jackpot"></span>
+        </h2>
+        <div>
+            <ul class="list-featured list-centered scrollReveal sr-bottom sr-delay-2">
+                <li>enforced by smart contract</li>
+                <li>uses Bitcoin blocks to pick winner</li>
+                <li>trustless via the help of <a href='http://btcrelay.org/'>BTCRelay</a></li>
+                <li>low fee: 0.5 %</li>
+                <li>verified <a href='https://etherscan.io/address/0x302fE87B56330BE266599FAB2A54747299B5aC5B#code'>source code</a> available</li>
+            </ul>
+        </div><!-- .row -->
+      </div><!-- .container -->
+    </section><!-- .fw-section -->
+
+    <div id="react-app"></div>
+
+    <!-- Source code -->
+    <section class="fw-section bg-parallax padding-top-2x padding-bottom-3x" style="background-image: url(img/home/app-bg01.jpg);" data-stellar-background-ratio="0.65">
+      <div class="container">
+        <h3 class="text-center">Source code</h3>
+
+<div class="highlight"><pre><span></span><span class="kd">contract</span> <span class="nx">BTCRelay</span> <span class="p">{</span>
+    <span class="kd">function</span> <span class="nx">getLastBlockHeight</span><span class="p">()</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">getBlockchainHead</span><span class="p">()</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">getFeeAmount</span><span class="p">(</span><span class="kt">int</span> <span class="nx">blockHash</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">getBlockHeader</span><span class="p">(</span><span class="kt">int</span> <span class="nx">blockHash</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="kd">contract</span> <span class="nx">Lottery</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="k">constant</span> <span class="nx">LOTTERY_BLOCKS</span> <span class="o">=</span> <span class="mi">7</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">constant</span> <span class="nx">LOTTERY_INTERVAL</span> <span class="o">=</span> <span class="mi">7</span> <span class="nx">days</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="k">constant</span> <span class="nx">CUTOFF_BLOCKS</span> <span class="o">=</span> <span class="mi">6</span> <span class="o">*</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">constant</span> <span class="nx">CUTOFF_INTERVAL</span> <span class="o">=</span> <span class="mi">6</span> <span class="nx">hours</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">constant</span> <span class="nx">TICKET_PRICE</span> <span class="o">=</span> <span class="mi">10</span> <span class="nx">finney</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">constant</span> <span class="nx">FEE_FACTOR</span> <span class="o">=</span> <span class="mi">200</span><span class="p">;</span> <span class="c1">// 0.5 %</span>
+
+    <span class="nx">BTCRelay</span> <span class="nx">btcRelay</span> <span class="o">=</span> <span class="nx">BTCRelay</span><span class="p">(</span><span class="mh">0x41f274c0023f83391de4e0733c609df5a124c3d4</span><span class="p">);</span>
+
+    <span class="kd">struct</span> <span class="nx">Bucket</span> <span class="p">{</span>
+        <span class="kt">uint</span> <span class="nx">numHolders</span><span class="p">;</span>
+        <span class="kt">address</span><span class="p">[]</span> <span class="nx">ticketHolders</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">struct</span> <span class="nx">Payout</span> <span class="p">{</span>
+        <span class="kt">address</span> <span class="nx">winner</span><span class="p">;</span>
+        <span class="kt">uint</span> <span class="nx">amount</span><span class="p">;</span>
+        <span class="kt">uint</span> <span class="nx">blockNumber</span><span class="p">;</span>
+        <span class="kt">uint</span> <span class="nx">timestamp</span><span class="p">;</span>
+        <span class="kt">address</span> <span class="nx">processor</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kt">int</span> <span class="k">public</span> <span class="nx">decidingBlock</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="k">public</span> <span class="nx">cutoffBlock</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">public</span> <span class="nx">cutoffTimestamp</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="k">public</span> <span class="nx">nearestKnownBlock</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="k">public</span> <span class="nx">nearestKnownBlockHash</span><span class="p">;</span>
+
+    <span class="kt">uint</span> <span class="k">public</span> <span class="nx">numTickets</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">public</span> <span class="nx">numBuckets</span><span class="p">;</span>
+    <span class="k">mapping</span> <span class="p">(</span><span class="kt">uint</span> <span class="o">=&gt;</span> <span class="nx">Bucket</span><span class="p">)</span> <span class="nx">buckets</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">public</span> <span class="nx">lastSaleTimestamp</span><span class="p">;</span>
+
+    <span class="nx">Payout</span><span class="p">[]</span> <span class="k">public</span> <span class="nx">payouts</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="k">public</span> <span class="nx">payoutIdx</span><span class="p">;</span>
+
+    <span class="kt">address</span> <span class="k">public</span> <span class="nx">owner</span><span class="p">;</span>
+
+    <span class="kd">modifier</span> <span class="nx">onlyOwner</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span> <span class="o">==</span> <span class="nx">owner</span><span class="p">)</span> <span class="nx">_</span> <span class="p">}</span>
+
+    <span class="kd">event</span> <span class="nx">Activity</span><span class="p">();</span>
+
+    <span class="kd">function</span> <span class="nx">Lottery</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">owner</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+        <span class="nx">payouts</span><span class="p">.</span><span class="nx">length</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+        <span class="nx">prepareLottery</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">prepareLottery</span><span class="p">()</span> <span class="k">internal</span> <span class="p">{</span>
+        <span class="nx">decidingBlock</span> <span class="o">=</span> <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getLastBlockHeight</span><span class="p">()</span> <span class="o">+</span> <span class="nx">LOTTERY_BLOCKS</span><span class="p">;</span>
+        <span class="nx">cutoffBlock</span> <span class="o">=</span> <span class="nx">decidingBlock</span> <span class="o">-</span> <span class="nx">CUTOFF_BLOCKS</span><span class="p">;</span>
+        <span class="nx">cutoffTimestamp</span> <span class="o">=</span> <span class="nx">now</span> <span class="o">+</span> <span class="nx">LOTTERY_INTERVAL</span> <span class="o">-</span> <span class="nx">CUTOFF_INTERVAL</span><span class="p">;</span>
+        <span class="nx">nearestKnownBlock</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nx">nearestKnownBlockHash</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="nx">numTickets</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">numBuckets</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">buckets</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">numHolders</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nx">numBuckets</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="nx">lastSaleTimestamp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">resetLottery</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">numTickets</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">payoutReady</span><span class="p">())</span> <span class="k">throw</span><span class="p">;</span>
+
+        <span class="nx">prepareLottery</span><span class="p">();</span>
+        <span class="nx">Activity</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">buyTickets</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">buyTickets</span><span class="p">(</span><span class="kt">address</span> <span class="nx">ticketHolder</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span> <span class="o">&lt;</span> <span class="nx">TICKET_PRICE</span><span class="p">)</span> <span class="k">throw</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ticketsAvailable</span><span class="p">())</span> <span class="k">throw</span><span class="p">;</span>
+
+        <span class="kt">uint</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span> <span class="o">/</span> <span class="nx">TICKET_PRICE</span><span class="p">;</span>
+        <span class="nx">numTickets</span> <span class="o">+=</span> <span class="nx">n</span><span class="p">;</span>
+
+        <span class="c1">// We maintain the list of ticket holders in a number of buckets.</span>
+        <span class="c1">// Entries in the first bucket represent one ticket each, in the</span>
+        <span class="c1">// second bucket they represent two tickets each, then four tickets</span>
+        <span class="c1">// each and so on. This allows us to process the sale of n tickets</span>
+        <span class="c1">// with a gas cost of O(log(n)).</span>
+        <span class="kt">uint</span> <span class="nx">bucket</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kt">uint</span> <span class="nx">inThisBucket</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="nx">bucket</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">inThisBucket</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kt">uint</span> <span class="nx">pos</span> <span class="o">=</span> <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">numHolders</span><span class="o">++</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">ticketHolders</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span>
+                    <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">numHolders</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">ticketHolders</span><span class="p">.</span><span class="nx">length</span> <span class="o">=</span>
+                        <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">numHolders</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">ticketHolders</span><span class="p">[</span><span class="nx">pos</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ticketHolder</span><span class="p">;</span>
+                <span class="nx">n</span> <span class="o">-=</span> <span class="nx">inThisBucket</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="nx">bucket</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">bucket</span> <span class="o">&gt;</span> <span class="nx">numBuckets</span><span class="p">)</span> <span class="nx">numBuckets</span> <span class="o">=</span> <span class="nx">bucket</span><span class="p">;</span>
+
+        <span class="kt">int</span> <span class="nx">missingBlocks</span> <span class="o">=</span> <span class="nx">decidingBlock</span> <span class="o">-</span> <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getLastBlockHeight</span><span class="p">();</span>
+        <span class="kt">uint</span> <span class="nx">betterCutoffTimestamp</span> <span class="o">=</span>
+            <span class="nx">now</span> <span class="o">+</span> <span class="kt">uint</span><span class="p">(</span><span class="nx">missingBlocks</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span> <span class="nx">minutes</span> <span class="o">-</span> <span class="nx">CUTOFF_INTERVAL</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">betterCutoffTimestamp</span> <span class="o">&lt;</span> <span class="nx">cutoffTimestamp</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">cutoffTimestamp</span> <span class="o">=</span> <span class="nx">betterCutoffTimestamp</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nx">lastSaleTimestamp</span> <span class="o">=</span> <span class="nx">now</span><span class="p">;</span>
+        <span class="nx">Activity</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">ticketsAvailable</span><span class="p">()</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">now</span> <span class="o">&lt;</span> <span class="nx">cutoffTimestamp</span> <span class="o">&amp;&amp;</span>
+            <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getLastBlockHeight</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nx">cutoffBlock</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">lookupTicketHolder</span><span class="p">(</span><span class="kt">uint</span> <span class="nx">idx</span><span class="p">)</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">uint</span> <span class="nx">bucket</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">&gt;=</span> <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">numHolders</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="nx">bucket</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nx">idx</span> <span class="o">-=</span> <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">numHolders</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="nx">bucket</span><span class="p">);</span>
+            <span class="nx">bucket</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">ticketHolders</span><span class="p">[</span><span class="nx">idx</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="nx">bucket</span><span class="p">)];</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">getNumHolders</span><span class="p">(</span><span class="kt">uint</span> <span class="nx">bucket</span><span class="p">)</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">numHolders</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">getTicketHolders</span><span class="p">(</span><span class="kt">uint</span> <span class="nx">bucket</span><span class="p">)</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">[])</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">buckets</span><span class="p">[</span><span class="nx">bucket</span><span class="p">].</span><span class="nx">ticketHolders</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">getLastBlockHeight</span><span class="p">()</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getLastBlockHeight</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">getOperatingBudget</span><span class="p">()</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">balance</span> <span class="o">-</span> <span class="nx">numTickets</span> <span class="o">*</span> <span class="nx">TICKET_PRICE</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">checkDepth</span><span class="p">(</span><span class="kt">uint</span> <span class="nx">n</span><span class="p">)</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">checkDepth</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">payoutReady</span><span class="p">()</span> <span class="k">constant</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">decidingBlock</span> <span class="o">&lt;=</span> <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getLastBlockHeight</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">processPayout</span><span class="p">()</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">payoutReady</span><span class="p">())</span> <span class="k">throw</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">getOperatingBudget</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="nx">ether</span><span class="p">)</span> <span class="k">throw</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">numTickets</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">checkDepth</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span> <span class="k">throw</span><span class="p">;</span>
+
+        <span class="kd">var</span> <span class="p">(</span><span class="nx">walkingDone</span><span class="p">,</span> <span class="nx">blockHash</span><span class="p">)</span> <span class="o">=</span> <span class="nx">walkTowardsBlock</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">walkingDone</span><span class="p">)</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+
+        <span class="kt">int</span> <span class="nx">winnerIdx</span> <span class="o">=</span> <span class="nx">blockHash</span> <span class="o">%</span> <span class="kt">int</span><span class="p">(</span><span class="nx">numTickets</span><span class="p">);</span>
+        <span class="kt">address</span> <span class="nx">winner</span> <span class="o">=</span> <span class="nx">lookupTicketHolder</span><span class="p">(</span><span class="kt">uint</span><span class="p">(</span><span class="nx">winnerIdx</span><span class="p">));</span>
+        <span class="kt">uint</span> <span class="nx">fee</span> <span class="o">=</span> <span class="p">(</span><span class="nx">numTickets</span> <span class="o">*</span> <span class="nx">TICKET_PRICE</span><span class="p">)</span> <span class="o">/</span> <span class="nx">FEE_FACTOR</span><span class="p">;</span>
+        <span class="kt">uint</span> <span class="nx">amount</span> <span class="o">=</span> <span class="p">(</span><span class="nx">numTickets</span> <span class="o">*</span> <span class="nx">TICKET_PRICE</span><span class="p">)</span> <span class="o">-</span> <span class="nx">fee</span><span class="p">;</span>
+
+        <span class="c1">// keep some records</span>
+        <span class="nx">payouts</span><span class="p">[</span><span class="nx">payoutIdx</span><span class="p">].</span><span class="nx">winner</span> <span class="o">=</span> <span class="nx">winner</span><span class="p">;</span>
+        <span class="nx">payouts</span><span class="p">[</span><span class="nx">payoutIdx</span><span class="p">].</span><span class="nx">amount</span> <span class="o">=</span> <span class="nx">amount</span><span class="p">;</span>
+        <span class="nx">payouts</span><span class="p">[</span><span class="nx">payoutIdx</span><span class="p">].</span><span class="nx">blockNumber</span> <span class="o">=</span> <span class="nx">block</span><span class="p">.</span><span class="nx">number</span><span class="p">;</span>
+        <span class="nx">payouts</span><span class="p">[</span><span class="nx">payoutIdx</span><span class="p">].</span><span class="nx">timestamp</span> <span class="o">=</span> <span class="nx">now</span><span class="p">;</span>
+        <span class="nx">payouts</span><span class="p">[</span><span class="nx">payoutIdx</span><span class="p">].</span><span class="nx">processor</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+        <span class="nx">payoutIdx</span> <span class="o">=</span> <span class="p">(</span><span class="nx">payoutIdx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">;</span>
+
+        <span class="nx">prepareLottery</span><span class="p">();</span>   <span class="c1">// prepare next round</span>
+        <span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">winner</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">amount</span><span class="p">);</span>
+        <span class="nx">Activity</span><span class="p">();</span>
+
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">walkTowardsBlock</span><span class="p">()</span> <span class="k">internal</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="nx">blockHeight</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="nx">blockHash</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">nearestKnownBlock</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">blockHeight</span> <span class="o">=</span> <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getLastBlockHeight</span><span class="p">();</span>
+            <span class="nx">blockHash</span> <span class="o">=</span> <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getBlockchainHead</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">blockHeight</span> <span class="o">=</span> <span class="nx">nearestKnownBlock</span><span class="p">;</span>
+            <span class="nx">blockHash</span> <span class="o">=</span> <span class="nx">nearestKnownBlockHash</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Walk at most 5 steps to keep an upper limit on gas costs.</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="nx">steps</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">steps</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">steps</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">blockHeight</span> <span class="o">==</span> <span class="nx">decidingBlock</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="nx">blockHash</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="kt">uint</span> <span class="nx">fee</span> <span class="o">=</span> <span class="kt">uint</span><span class="p">(</span><span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getFeeAmount</span><span class="p">(</span><span class="nx">blockHash</span><span class="p">));</span>
+            <span class="kt">bytes32</span> <span class="nx">blockHeader</span> <span class="o">=</span>
+                <span class="nx">btcRelay</span><span class="p">.</span><span class="nx">getBlockHeader</span><span class="p">.</span><span class="nx">value</span><span class="p">(</span><span class="nx">fee</span><span class="p">)(</span><span class="nx">blockHash</span><span class="p">)[</span><span class="mi">2</span><span class="p">];</span>
+            <span class="kt">bytes32</span> <span class="nx">temp</span><span class="p">;</span>
+
+            <span class="nx">assembly</span> <span class="p">{</span>
+                <span class="kd">let</span> <span class="nx">x</span> <span class="o">:=</span> <span class="nx">mload</span><span class="p">(</span><span class="mh">0x40</span><span class="p">)</span>
+                <span class="nx">mstore</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">blockHeader</span><span class="p">)</span>
+                <span class="nx">temp</span> <span class="o">:=</span> <span class="nx">mload</span><span class="p">(</span><span class="nx">add</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">))</span>
+            <span class="p">}</span>
+
+            <span class="nx">blockHeight</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="nx">blockHash</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">32</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">blockHash</span> <span class="o">=</span> <span class="nx">blockHash</span> <span class="o">|</span> <span class="kt">int</span><span class="p">(</span><span class="nx">temp</span><span class="p">[</span><span class="kt">uint</span><span class="p">(</span><span class="nx">i</span><span class="p">)])</span> <span class="o">*</span> <span class="p">(</span><span class="mi">256</span> <span class="o">**</span> <span class="nx">i</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Store the progress to pick up from there next time.</span>
+        <span class="nx">nearestKnownBlock</span> <span class="o">=</span> <span class="nx">blockHeight</span><span class="p">;</span>
+        <span class="nx">nearestKnownBlockHash</span> <span class="o">=</span> <span class="nx">blockHash</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="kc">false</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">accessOperatingBudget</span><span class="p">(</span><span class="kt">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">getOperatingBudget</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="nx">ether</span><span class="p">)</span> <span class="k">throw</span><span class="p">;</span>
+
+        <span class="kt">uint</span> <span class="nx">safeToAccess</span> <span class="o">=</span> <span class="nx">getOperatingBudget</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span> <span class="nx">ether</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">amount</span> <span class="o">&gt;</span> <span class="nx">safeToAccess</span><span class="p">)</span> <span class="k">throw</span><span class="p">;</span>
+
+        <span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">owner</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">amount</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">setOwner</span><span class="p">(</span><span class="kt">address</span> <span class="nx">_owner</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="p">{</span>
+        <span class="nx">owner</span> <span class="o">=</span> <span class="nx">_owner</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+      </div><!-- .container -->
+    </section><!-- .fw-section.next-to-footer -->
+
+    <!-- Scroll To Top Button -->
+    <a href="#" class="scroll-to-top-btn">
+      <i class="icon-arrow-up"></i> 
+    </a><!-- .scroll-to-top-btn -->
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="bottom-footer">
+        <div class="container">
+          <div class="copyright">
+            <div class="column">
+              <p>&copy; Ethereum Lottery 2016. Powered by the APIs of
+              <a href="https://etherscan.io">Etherscan</a>,
+              <a href="https://live.ether.camp">EtherCamp</a> and
+              <a href="https://blockr.io">blockr</a>.</p>
+            </div><!-- .column -->
+            <div class="column">
+            </div><!-- .column -->
+          </div><!-- .copyright -->
+        </div><!-- .container -->
+      </div><!-- .bottom-footer -->
+    </footer><!-- .footer -->
+
+  </div><!-- .page-wrapper -->
+
+  <!-- JavaScript (jQuery) libraries, plugins and custom scripts -->
+  <script src="js/vendor/jquery-2.1.4.min.js"></script>
+  <script src="js/vendor/preloader.min.js"></script>
+  <script src="js/vendor/bootstrap.min.js"></script>
+  <script src="js/vendor/waves.min.js"></script>
+  <script src="js/vendor/placeholder.js"></script>
+  <script src="js/vendor/smoothscroll.js"></script>
+  <script src="js/vendor/waypoints.min.js"></script>
+  <script src="js/vendor/icheck.min.js"></script>
+  <script src="js/vendor/velocity.min.js"></script>
+  <script src="js/vendor/magnific-popup.min.js"></script>
+  <script src="js/vendor/owl.carousel.min.js"></script>
+  <!-- <script src="js/vendor/scrollreveal.min.js"></script> -->
+  <script src="js/scripts.js"></script>
+  <script src="js/main.js"></script>
+
+</body><!-- <body> -->
+
+</html>
