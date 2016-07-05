@@ -48,7 +48,7 @@
             <ul class="list-featured list-centered scrollReveal sr-bottom sr-delay-2">
                 <li>enforced by smart contract</li>
                 <li>uses Bitcoin blocks to pick winner</li>
-                <li>trustless via the help of <a href='http://btcrelay.org/'>BTCRelay</a></li>
+                <li>Bitcoin data provided by <a href='http://btcrelay.org/'>BTCRelay</a></li>
                 <li>low fee: 0.5 %</li>
                 <li>verified <a href='https://etherscan.io/address/0x302fE87B56330BE266599FAB2A54747299B5aC5B#code'>source code</a> available</li>
             </ul>
@@ -58,8 +58,33 @@
 
     <div id="react-app"></div>
 
+    <section class="fw-section bg-default border-top padding-top-2x padding-bottom-2x">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6 padding-bottom scrollReveal sr-left">
+            <h3>About</h3>
+            <p class="text-gray text-lg">
+            The deterministic nature of blockchains makes it difficult to
+            provide a secure source of randomness. Oracles can be one solution
+            to this, but depending on the exact setup usually require trust in
+            the integrity of the oracle. This lottery instead uses Bitcoin
+            blocks as a source of randomness. While they are not beyond the
+            reach of tampering, Bitcoin's longer block time and higher exchange
+            rate ensure more safety than a single Ethereum block would. The
+            smart contract accesses this data via
+            <a href='http://btcrelay.org/'>BTCRelay</a>
+            and uses it to decide on the outcome of the lottery.
+            </p>
+          </div>
+          <div class="col-sm-6 padding-top-2x scrollReveal sr-right">
+            <img src="img/home/features.png" alt="Features">
+          </div>
+        </div><!-- .row -->
+      </div><!-- .container -->
+    </section><!-- .fw-section.bg-default.border-top -->
+
     <!-- Source code -->
-    <section class="fw-section bg-parallax padding-top-2x padding-bottom-3x" style="background-image: url(img/home/app-bg01.jpg);" data-stellar-background-ratio="0.65">
+    <section class="fw-section bg-parallax padding-top-2x padding-bottom-2x" style="background-image: url(img/home/app-bg01.jpg);" data-stellar-background-ratio="0.65">
       <div class="container">
         <h3 class="text-center">Source code</h3>
 
