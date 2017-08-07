@@ -35,3 +35,163 @@
 .bg-custom {
     background-color: #f9f9f9;
 }
+
+.ticket-details-header {
+    text-align: center;
+}
+
+.ticket-selection-box {
+    max-width: 500px;
+    margin: auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-content: flex-start;
+    justify-content: space-around;
+}
+
+.ticket {
+    background: white;
+    border: 2px solid black;
+    text-align: center;
+    margin: 2px;
+    padding: 3px;
+    font-size: 20px;
+}
+
+.ticket-available {
+    cursor: pointer;
+}
+
+.ticket-sold {
+    opacity: 0.2;
+    cursor: not-allowed;;
+}
+
+.ticket-owned {
+    background: black;
+    color: white;
+}
+
+.ticket-filler {
+    text-align: center;
+    margin: 4px;    /* +2 of .ticket to account for missing border */
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 20px;
+    height: 0;
+    overflow: hidden;
+}
+
+.ticket-only-icon {
+    height: 0;
+    overflow: hidden;
+}
+
+.ticket-hint {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+.ticket-no-web3 {
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+}
+
+.ticket-no-web3-notice {
+    font-weight: bold;
+}
+
+.ticket-app-icons {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    padding-top: 20px;
+    padding-bottom: 15px;
+}
+
+.ticket-app-icon {
+    text-align: center;
+}
+
+.ticket-app-icon img {
+    margin: auto;
+}
+
+.ticket-selection-list {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.ticket-buttons {
+    max-width: 400px;
+    margin: auto;
+}
+
+.ticket-buttons-selection {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+}
+
+.ticket-button-random {
+    margin-right: 0;
+}
+
+.ticket-button-clear {
+    margin-right: 0;
+}
+
+.ticket-button-buy {
+    width: 100%;
+}
+
+@media (max-width: 400px) {
+    .ticket-button-random {
+        width: 100%;
+    }
+
+    .ticket-button-clear {
+        width: 100%;
+    }
+}
+
+.ticket-buttons-hint {
+    text-align: center;
+}
+
+.jackpot-details {
+    font-size: 20px;
+    display: block;
+}
+
+.lottery-details {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.lottery-details-prev .btn {
+    padding: 0 5px;
+    margin-right: 5px;
+}
+
+.lottery-details-next .btn {
+    padding: 0 5px;
+    margin-left: 5px;
+}
+
+.break-all {
+    word-break: break-all;
+}
+
+.winner-message {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.winner-message2 {
+    background-color: white;
+}
