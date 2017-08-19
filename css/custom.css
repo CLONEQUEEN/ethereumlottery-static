@@ -193,5 +193,7 @@
 }
 
 .winner-message2 {
-    background-color: white;
+    font-style: italic;
+    border: 1px dashed black;
+    padding: 5px;
 }
