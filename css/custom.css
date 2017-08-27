@@ -192,8 +192,14 @@
     margin-bottom: 0;
 }
 
-.winner-message2 {
+.winner-message-text {
     font-style: italic;
     border: 1px dashed black;
     padding: 5px;
+}
+
+.winner-message-details {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
 }
