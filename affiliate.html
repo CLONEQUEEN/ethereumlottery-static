@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Ethereum Lottery - Affiliate dashboard</title>
+
+  <!--Mobile Specific Meta Tag-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <!--Favicon-->
+  <link rel="shortcut icon" href="img/favicon.png">
+  <link rel="icon" href="img/favicon.png">
+
+  <!-- All Theme Styles including Bootstrap, FontAwesome, etc. compiled from styles.scss-->
+  <link href="css/styles.min.css" rel="stylesheet" media="screen">
+  <link href="css/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="css/custom.css" rel="stylesheet" media="screen">
+
+  <!--Modernizr / Detectizr-->
+  <script src="js/vendor/modernizr.custom.js"></script>
+  <script src="js/vendor/detectizr.min.js"></script>
+</head>
+
+<!-- Body -->
+<body>
+  <!-- Page Wrapper -->
+  <div class="page-wrapper">
+    <!-- Create Account Section -->
+    <section class="fw-section space-top padding-top text-center" style="background-image: url(img/home/funding-progress-bg.jpg);">
+      <div class="container padding-bottom">
+        <img src="img/clover.png" class="block-center" alt="Logo">
+        <h1 class="scrollReveal sr-bottom">Ethereum Lottery</h1>
+        <h2 class="text-gray text-normal scrollReveal sr-bottom sr-delay-1">
+            Affiliate dashboard
+        </h2>
+      </div><!-- .container -->
+    </section><!-- .fw-section -->
+
+    <section class="fw-section bg-default border-top padding-top-2x padding-bottom">
+      <div class="container">
+        <div class="panel text-custom scrollReveal sr-left">
+          <div class="panel-body">
+            Sign up as an affiliate and get paid for bringing users to the site.
+            You receive a personal link and users that follow this link will be
+            associated with your affiliate code. The association persists even
+            if the user returns at a later date via a direct link. You receive a
+            cut of 50 % of profits of any ticket purchases that this user makes.
+            This continues into the future indefinitely if the user should
+            return and buy more tickets. A typical ticket price might be
+            0.009 ETH of which 0.008333 ETH go towards the jackpot. Your cut
+            would amount to 50 % of the remaining 0.000667 ETH which is
+            0.0003335 ETH or around <span id="react-affiliate-payout">...</span>
+            per ticket bought (now and in the future). The user's ticket
+            purchasing transaction will directly split of this amount and send
+            it to the Ethereum address that you sign up with - as long as this
+            transfer uses less than 35000 gas.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="fw-section bg-custom border-top padding-top padding-bottom border-bottom">
+      <div class="container">
+        <div id="react-affiliate-dashboard"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="bottom-footer">
+        <div class="container">
+          <div class="copyright">
+            <p>&copy; Ethereum Lottery 2016, 2017.</p>
+          </div><!-- .copyright -->
+        </div><!-- .container -->
+      </div><!-- .bottom-footer -->
+    </footer><!-- .footer -->
+
+  </div><!-- .page-wrapper -->
+
+  <!-- JavaScript (jQuery) libraries, plugins and custom scripts -->
+  <script src="js/vendor/jquery-2.1.4.min.js"></script>
+  <script src="js/vendor/bootstrap.min.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/main.js"></script>
+
+</body><!-- <body> -->
+
+</html>
