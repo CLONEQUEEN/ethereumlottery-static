@@ -32,48 +32,52 @@
         <img src="img/clover.png" class="block-center" alt="Logo">
         <h1 class="scrollReveal sr-bottom">Ethereum Lottery</h1>
         <h2 class="text-gray text-normal scrollReveal sr-bottom sr-delay-1">
-            <span id="react-jackpot"></span>
+            is no longer in operation
         </h2>
-        <div>
-            <ul class="list-featured list-centered scrollReveal sr-bottom sr-delay-2">
-                <li>enforced by smart contract</li>
-                <li>uses Bitcoin blocks to pick winner</li>
-                <li>Bitcoin data provided by <a href='http://btcrelay.org/'>BTCRelay</a></li>
-                <li>verified <a href='https://etherscan.io/address/0x40658db197bddea6a51cb576fe975ca488ab3693#code'>source code</a> available</li>
-            </ul>
-        </div><!-- .row -->
       </div><!-- .container -->
     </section><!-- .fw-section -->
 
-    <section class="fw-section bg-default border-top padding-top-2x padding-bottom">
-      <div class="container">
-        <div id="react-lottery-details"></div>
-      </div>
-    </section>
-
-    <section class="fw-section bg-parallax border-top padding-top padding-bottom" style="background-image: url(img/home/app-bg01.jpg);" data-stellar-background-ratio="0.65">
-      <div class="container">
-        <div id="react-ticket-details"></div>
-      </div>
-    </section>
-
     <section class="fw-section bg-custom border-top padding-top padding-bottom">
       <div class="container">
-        <div class="row">
-          <div class="col-sm-6">
-            <h3>A word from the winner</h3>
-            <div id="react-winner-message"></div>
-          </div>
-          <div class="col-sm-6">
-            <img src="img/home/machinery.png" class="block-center padding-bottom" alt="Machinery">
-          </div>
-        </div>
         <div class="row">
           <div class="col-sm-6">
             <img src="img/home/machinery02.png" class="block-center padding-bottom" alt="Machinery">
           </div>
           <div class="col-sm-6">
             <h3>Previous winners</h3>
+            <div>
+              &mdash; no message &mdash;
+            </div>
+            <div class='winner-message-details'>
+              <span>Lottery #3</span>
+              <span>2.5 ETH with payout transaction <a href='https://etherscan.io/tx/0x8990faa6dcc8ae98ea935538005ea71d9ac368ee9cfe1f3817c191bb5dd0667d'>0x8990...667d</a></span>
+            </div>
+            <div>
+              &mdash; no message &mdash;
+            </div>
+            <div class='winner-message-details'>
+              <span>Lottery #2</span>
+              <span>2.5 ETH with payout transaction <a href='https://etherscan.io/tx/0x182cc254d9d7ad355bb92752ba15844cd9287c798b37560dc32783aa9916c1d6'>0x182c...c1d6</a></span>
+            </div>
+            <div class='winner-message-text'>
+              I never liked big lottery. Ethereum make everything possible!
+              Election, Lottery and many more will follow without fear of
+              corruption. Thanks to the guy who made this contract! Bitcoin BTC
+              , Ethereum ETH, Litecoin LTC, Vertcoin VTC, Blackcoin to the moon
+              :) HODL Thanks to Satoshi Nakamoto, Vitalik Buterin Hello
+              Marie-Eve, NJ, MJ, AZ, JG, MM
+            </div>
+            <div class='winner-message-details'>
+              <span>Lottery #1</span>
+              <span>2.5 ETH with payout transaction <a href='https://etherscan.io/tx/0xb6a227d63c503ca6b7e5b54e23ed6412012d933d3bc0489b2b48bd39a739f1ed'>0xb6a2...f1ed</a></span>
+            </div>
+            <div>
+              &mdash; no message &mdash;
+            </div>
+            <div class='winner-message-details'>
+              <span>Lottery #0</span>
+              <span>2.5 ETH with payout transaction <a href='https://etherscan.io/tx/0x188483a958d7ce9cd664849ad246aef04de2ab92c4c8cd277d8ec92d22f96e5f'>0x1884...6e5f</a></span>
+            </div>
             <div class='winner-message-text'>
               Smart Contract Lotteries will blow up government run lotteries.
               There will be an app for that. Expect many governments to try to
@@ -81,7 +85,7 @@
               will change things. Plus, I WON!
             </div>
             <div class='winner-message-details'>
-              <span>Lottery #0 (previous version)</span>
+              <span>Previous smart contract version</span>
               <span>2.5 ETH with payout transaction <a href='https://etherscan.io/tx/0xa426ef044120847990214bb52b334b0175e8a30f19d6a2ea31b0dc8b143f4d69'>0xa426...4d69</a></span>
             </div>
             <div class='winner-message-text'>
@@ -91,7 +95,7 @@
               the moon y'all. Cheers.
             </div>
             <div class='winner-message-details'>
-              <span>Lottery #2 (previous version)</span>
+              <span>Previous smart contract version</span>
               <span>2.5 ETH with payout transaction <a href='https://etherscan.io/tx/0x2cd18a97b49c7d1d696730c3988ee5b183ec3627ed2e4ff0d667d4ca5bcc5e55'>0x2cd1...5e55</a></span>
             </div>
           </div>
@@ -110,14 +114,14 @@
             to this, but depending on the exact setup usually require trust in
             the integrity of the oracle. Other, more secure approaches tend to be
             so complex as to make it hard to transparently demonstrate how a
-            specific result was reached. This lottery instead uses Bitcoin
+            specific result was reached. This lottery instead used Bitcoin
             blocks as a source of randomness. While they are not beyond the
             reach of tampering, Bitcoin's longer block time and higher exchange
             rate ensure more safety than a single Ethereum block would.
             Furthermore, anyone can easily double-check the result using nothing
-            but a block explorer and some simple math. The smart contract accesses
+            but a block explorer and some simple math. The smart contract accessed
             this data via <a href='http://btcrelay.org/'>BTCRelay</a>
-            and uses it to decide on the outcome of the lottery.
+            and used it to decide on the outcome of the lottery.
             </p>
           </div>
           <div class="col-sm-6 padding-top-2x scrollReveal sr-right">
@@ -133,14 +137,11 @@
         <div class="container">
           <div class="row">
             <div class="col-sm-10 footer-left">
-              <p>&copy; Ethereum Lottery 2016, 2017. Powered by the APIs of
+              <p>&copy; Ethereum Lottery 2016 &ndash; 2018. Powered by the APIs of
               <a href="https://etherscan.io">Etherscan</a>,
               <a href="https://infura.io">Infura</a>,
               <a href="http://ethgasstation.info">ETH Gas Station</a> and
               <a href="https://blockexplorer.com">Bitcoin Block Explorer</a>.</p>
-            </div>
-            <div class="col-sm-2 footer-right">
-              <a href="affiliate.html">Affiliate</a>
             </div>
           </div>
         </div><!-- .container -->
@@ -153,7 +154,7 @@
   <script src="js/vendor/jquery-2.1.4.min.js"></script>
   <script src="js/vendor/bootstrap.min.js"></script>
   <script src="js/analytics.js"></script>
-  <script src="js/main.js"></script>
+  <!-- <script src="js/main.js"></script> -->
 
 </body><!-- <body> -->
 
